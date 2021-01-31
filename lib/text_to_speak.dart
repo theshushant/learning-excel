@@ -13,8 +13,10 @@ import 'package:toast/toast.dart';
 
 class TextToSpeak extends StatefulWidget {
   final String text;
+  final String answer;
+  final bool isTest;
 
-  TextToSpeak(this.text);
+  TextToSpeak(this.text, {this.answer,this.isTest=false});
 
   @override
   _TextToSpeakState createState() => _TextToSpeakState();
@@ -51,13 +53,11 @@ class _TextToSpeakState extends State<TextToSpeak> {
     bool hasSpeech = await speech.initialize(
         onError: errorListener, onStatus: statusListener);
     if (hasSpeech) {
-
       var systemLocale = await speech.systemLocale();
       _currentLocaleId = systemLocale.localeId;
     }
 
     if (!mounted) return;
-
   }
 
   void errorListener(SpeechRecognitionError error) {
@@ -111,7 +111,7 @@ class _TextToSpeakState extends State<TextToSpeak> {
 
   void resultListener(SpeechRecognitionResult result) {
     setState(() {
-      lastWords = "${result.recognizedWords} - ${result.finalResult}";
+      lastWords = "${result.recognizedWords} - ${widget.answer==result.recognizedWords?true:false}";
     });
   }
 
@@ -188,7 +188,12 @@ class _TextToSpeakState extends State<TextToSpeak> {
   Future _speak() async {
     await flutterTts.setVolume(volume);
     await flutterTts.setSpeechRate(1.5);
-    await flutterTts.speak(widget.text);
+    await flutterTts.speak("Question is "+widget.text).whenComplete(() async {
+      if(!widget.isTest){
+        await Future.delayed(Duration(seconds: 4));
+        await flutterTts.speak("Answer is "+widget.answer);
+      }
+  });
   }
 
   Future _stop() async {
@@ -217,7 +222,7 @@ class _TextToSpeakState extends State<TextToSpeak> {
         lastWords,
         style: TextStyle(color: Colors.blue),
       ),
-      Align(
+      widget.isTest?Align(
         alignment: Alignment.centerRight,
         child: FloatingActionButton(
           tooltip: "Press For Recording",
@@ -231,11 +236,12 @@ class _TextToSpeakState extends State<TextToSpeak> {
             ),
           ),
         ),
-      ),
+      ):Container(),
     ]);
   }
 
-  Widget _inputSection() => Expanded(
+  Widget _inputSection() =>
+      Expanded(
         child: Container(
           alignment: Alignment.center,
           margin: EdgeInsets.only(
@@ -262,7 +268,7 @@ class _TextToSpeakState extends State<TextToSpeak> {
       return Container(
           padding: EdgeInsets.only(top: 50.0),
           child:
-              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
             _buildButtonColumn(Colors.green, Colors.greenAccent,
                 Icons.play_arrow, 'PLAY', _speak),
             _buildButtonColumn(
@@ -272,7 +278,7 @@ class _TextToSpeakState extends State<TextToSpeak> {
       return Container(
           padding: EdgeInsets.only(top: 50.0),
           child:
-              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
             _buildButtonColumn(Colors.green, Colors.greenAccent,
                 Icons.play_arrow, 'PLAY', _speak),
             _buildButtonColumn(

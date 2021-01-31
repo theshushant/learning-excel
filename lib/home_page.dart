@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:learnexcel/random.dart';
 import 'package:learnexcel/text_to_speak.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -44,10 +45,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   TextFormField(
                     style: TextStyle(color: Colors.blue),
-                    autovalidate: true,
-                    validator: (value){
-                      if(value.trim().isEmpty)
-                        return "Required";
+                    validator: (value) {
+                      if (value.trim().isEmpty) return "Required";
                       return null;
                     },
                     decoration: InputDecoration(
@@ -74,10 +73,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   TextFormField(
 //                key: key,
-                    autovalidate: true,
-                    validator: (value){
-                      if(value.trim().isEmpty)
-                        return "Required";
+                    validator: (value) {
+                      if (value.trim().isEmpty) return "Required";
                       return null;
                     },
                     obscureText: true,
@@ -106,26 +103,16 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   InkWell(
                       onTap: () => {
-                        key.currentState.save(),
-
-                        if(key.currentState.validate()){
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Scaffold(
-                                  body: Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 20,
-                                      vertical: 20,
-                                    ),
-                                    child: TextToSpeak(
-                                      "heloo Sir",
-                                    ),
+                            key.currentState.save(),
+                            if (key.currentState.validate())
+                              {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Random(),
                                   ),
-                                ),
-                              ),
-                            )
-                        }
+                                )
+                              }
                           },
                       child: Container(
                         alignment: Alignment.center,
